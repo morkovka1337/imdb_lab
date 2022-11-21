@@ -48,13 +48,28 @@ class MMIMDBDatasetNew(Dataset):
         return len(self.meta_info.index)
 
     def __getitem__(self, index):
-        image_path = os.path.join(
-            self.data_path, 'img', f"{self.meta_info['id'][index]}.jpg")
-        image = cv.imread(image_path)
-        if image is None:
-            new_idx = random.choice(range(self.__len__()))
-            return self.__getitem__(new_idx)
-        # assert image is not None, f'wrong path {image_path}'
+        try:
+            image_path = os.path.join(
+                self.data_path, 'img', f"{self.meta_info['id'][index]}.jpg")
+            image = cv.imread(image_path)
+            assert image is not None
+        except AssertionError:
+            try:
+                image_path = os.path.join(
+                    self.data_path, 'img', f"0{self.meta_info['id'][index]}.jpg")
+                image = cv.imread(image_path)
+                assert image is not None
+            except AssertionError:
+                try:
+                    image_path = os.path.join(
+                        self.data_path, 'img', f"00{self.meta_info['id'][index]}.jpg")
+                    image = cv.imread(image_path)
+                    assert image is not None
+                except AssertionError:
+                    image_path = os.path.join(
+                        self.data_path, 'img', f"000{self.meta_info['id'][index]}.jpg")
+                    image = cv.imread(image_path)
+        assert image is not None, f'wrong path {image_path}, {index=}'
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         image = cv.resize(image, IMG_SIZE)
         image = self.img_transforms(image)
