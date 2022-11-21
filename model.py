@@ -11,11 +11,11 @@ class MMModel(nn.Module):
         self.image_extractor.fc = nn.Identity()
         self.head = nn.Sequential(
             nn.Linear(embed_dim, embed_dim // 2),
-            nn.ReLU(inplace=True),
             nn.BatchNorm1d(embed_dim // 2),
-            nn.Linear(embed_dim // 2, embed_dim // 4),
             nn.ReLU(inplace=True),
+            nn.Linear(embed_dim // 2, embed_dim // 4),
             nn.BatchNorm1d(embed_dim // 4),
+            nn.ReLU(inplace=True),
             nn.Linear(embed_dim // 4, num_class),
         )
 
