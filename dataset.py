@@ -48,27 +48,22 @@ class MMIMDBDatasetNew(Dataset):
         return len(self.meta_info.index)
 
     def __getitem__(self, index):
-        try:
-            image_path = os.path.join(
-                self.data_path, 'img', f"{self.meta_info['id'][index]}.jpg")
-            image = cv.imread(image_path)
-            assert image is not None
-        except AssertionError:
-            try:
-                image_path = os.path.join(
-                    self.data_path, 'img', f"0{self.meta_info['id'][index]}.jpg")
-                image = cv.imread(image_path)
-                assert image is not None
-            except AssertionError:
-                try:
-                    image_path = os.path.join(
-                        self.data_path, 'img', f"00{self.meta_info['id'][index]}.jpg")
-                    image = cv.imread(image_path)
-                    assert image is not None
-                except AssertionError:
-                    image_path = os.path.join(
-                        self.data_path, 'img', f"000{self.meta_info['id'][index]}.jpg")
-                    image = cv.imread(image_path)
+        options = [
+            os.path.join(
+                self.data_path, 'img', f"{self.meta_info['id'][index]}.jpg"),
+            os.path.join(
+                self.data_path, 'img', f"0{self.meta_info['id'][index]}.jpg"),
+            os.path.join(
+                self.data_path, 'img', f"00{self.meta_info['id'][index]}.jpg"),
+            os.path.join(
+                self.data_path, 'img', f"000{self.meta_info['id'][index]}.jpg"),
+        ]
+
+        for file_path in options:
+            if os.path.exists(file_path):
+                image_path = file_path
+
+        image = cv.imread(image_path)
         assert image is not None, f'wrong path {image_path}, {index=}'
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         image = cv.resize(image, IMG_SIZE)
