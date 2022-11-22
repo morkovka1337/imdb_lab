@@ -4,7 +4,6 @@ from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 import os
 from kornia.losses.focal import BinaryFocalLossWithLogits
-import numpy as np
 
 from dataset import ALLOWED_GENRES, MMIMDBDatasetNew
 from model import MMModel
