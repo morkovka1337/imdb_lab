@@ -33,8 +33,9 @@ def train(lr, batch_size, num_classes, epochs, freeze_backbone=False, loss_type=
 
             genres = torch.stack(genres).to(device).T.to(torch.float)
 
-
+            forward_time = time.time()
             prediction = model(images, names, descriptions)
+            forward_time = time.time() - forward_time
             loss = criterion(prediction, genres)
             loss.backward()
             optimizer.step()
@@ -42,7 +43,7 @@ def train(lr, batch_size, num_classes, epochs, freeze_backbone=False, loss_type=
                 prediction_indices = torch.sigmoid(prediction) > 0.5
                 acc = (prediction_indices == genres).sum() / (batch_size * num_classes)
                 f1 = f1_score(prediction_indices.detach().cpu(), genres.cpu(), average="samples")
-                print(f'Epoch {epoch} [{i} / {len(train_loader)}], loss {loss.item():0.6f}, acc {acc:0.4f}, f1 {f1:0.4f}')
+                print(f'Epoch {epoch} [{i} / {len(train_loader)}], loss {loss.item():0.6f}, acc {acc:0.4f}, f1 {f1:0.4f}, forward time {forward_time:0.4f}')
         os.makedirs('models', exist_ok=True)
         print(f'Epoch execution time: {time.time() - epoch_start:0.4f} seconds')
         torch.save(model.state_dict(), f'models/model_epoch_{epoch}.pth')
