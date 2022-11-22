@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 import os
 from kornia.losses.focal import BinaryFocalLossWithLogits
+import time
 
 from dataset import ALLOWED_GENRES, MMIMDBDatasetNew
 from model import MMModel
@@ -25,7 +26,7 @@ def train(lr, batch_size, num_classes, epochs, freeze_backbone=False, loss_type=
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     for epoch in range(epochs):
         model.train()
-
+        epoch_start = time.time()
         for i, (images, names, descriptions, genres) in enumerate(train_loader):
             optimizer.zero_grad()
             images = images.to(device)
@@ -43,6 +44,7 @@ def train(lr, batch_size, num_classes, epochs, freeze_backbone=False, loss_type=
                 f1 = f1_score(prediction_indices.detach().cpu(), genres.cpu(), average="samples")
                 print(f'Epoch {epoch} [{i} / {len(train_loader)}], loss {loss.item():0.6f}, acc {acc:0.4f}, f1 {f1:0.4f}')
         os.makedirs('models', exist_ok=True)
+        print(f'Epoch execution time: {time.time() - epoch_start:0.4f} seconds')
         torch.save(model.state_dict(), f'models/model_epoch_{epoch}.pth')
         model.eval()
         val_acc = 0
