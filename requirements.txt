@@ -1,0 +1,8 @@
+torch
+timm
+transformers
+numpy
+scikit-learn
+fire
+kornia
+opencv-python
