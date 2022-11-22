@@ -3,12 +3,15 @@ import torch
 from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 import os
+from kornia.losses.focal import BinaryFocalLossWithLogits
+import numpy as np
 
 from dataset import ALLOWED_GENRES, MMIMDBDatasetNew
 from model import MMModel
 from sklearn.metrics import f1_score
 
-def train(lr, batch_size, num_classes, epochs, freeze_backbone=False):
+def train(lr, batch_size, num_classes, epochs, freeze_backbone=False, loss_type='bce', alpha_focal=1):
+    assert loss_type in ['bce', 'focal']
     print_freq = 25
     dataset = MMIMDBDatasetNew('mmimdb_parced/')
     train_len = int(len(dataset) * 0.7)
@@ -18,9 +21,9 @@ def train(lr, batch_size, num_classes, epochs, freeze_backbone=False):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     model = MMModel(1024, num_classes, freeze_backbone=freeze_backbone).to(device)
-    # checkpoint = torch.load(f'model_epoch_10.pth')
+    # checkpoint = torch.load(f'models/model_epoch_19.pth')
     # model.load_state_dict(checkpoint)
-    criterion = torch.nn.BCEWithLogitsLoss()
+    criterion = torch.nn.BCEWithLogitsLoss() if loss_type == 'bce' else BinaryFocalLossWithLogits(alpha_focal, reduction='mean')
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     for epoch in range(epochs):
         model.train()
