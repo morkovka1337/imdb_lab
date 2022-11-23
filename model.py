@@ -5,9 +5,9 @@ from transformers import ElectraTokenizer, ElectraModel
 
 
 class MMModel(nn.Module):
-    def __init__(self, embed_dim, num_class, device='cuda', freeze_backbone=False):
+    def __init__(self, embed_dim, num_class, img_extractor='resnet34', device='cuda', freeze_backbone=False):
         super().__init__()
-        self.image_extractor = timm.models.resnet.resnet34(pretrained=True)
+        self.image_extractor = getattr(timm.models.resnet, img_extractor)(pretrained=True)
         self.image_extractor.fc = nn.Identity()
         self.head = nn.Sequential(
             nn.Linear(embed_dim, embed_dim // 2),

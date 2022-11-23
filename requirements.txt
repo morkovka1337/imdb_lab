@@ -6,3 +6,4 @@ scikit-learn
 fire
 kornia
 opencv-python
+albumentations
