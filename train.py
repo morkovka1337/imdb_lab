@@ -13,7 +13,7 @@ from model import MMModel
 from sklearn.metrics import f1_score
 
 
-def train(lr, batch_size, num_classes, epochs, freeze_backbone=False, loss_type='bce', alpha_focal=1, device='cuda', img_extractor='resnet34', inner_features_size=1024):
+def train(lr, batch_size, num_classes, epochs, loss_type='bce', alpha_focal=1, device='cuda', img_extractor='resnet34', inner_features_size=1024):
     assert loss_type in ['bce', 'focal']
     train_dataset = MMIMDBDatasetNew('mmimdb_parced/',
                                      split='train',
@@ -39,7 +39,7 @@ def train(lr, batch_size, num_classes, epochs, freeze_backbone=False, loss_type=
 
     print_freq = len(train_loader) // 5
     model = MMModel(inner_features_size, num_classes, img_extractor=img_extractor,
-                    device=device, freeze_backbone=freeze_backbone)
+                    device=device)
     # checkpoint = torch.load(f'models/model_epoch_19.pth')
     # model.load_state_dict(checkpoint)
     criterion = torch.nn.BCEWithLogitsLoss() if loss_type == 'bce' else BinaryFocalLossWithLogits(alpha_focal, reduction='mean')
